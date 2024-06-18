@@ -1,6 +1,4 @@
 package com.example.SpringSecurityJwt.config;
-
-
 import com.example.SpringSecurityJwt.model.Token;
 import com.example.SpringSecurityJwt.repository.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
