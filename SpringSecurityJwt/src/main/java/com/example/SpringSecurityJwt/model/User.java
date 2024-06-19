@@ -37,9 +37,6 @@ public class User implements UserDetails {
     private Role role;
 
 
-    @OneToMany(mappedBy = "user")
-    private List<Token> tokens;
-
     @Override
     public boolean isAccountNonExpired() {
         return true;

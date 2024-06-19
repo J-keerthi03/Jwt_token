@@ -1,6 +1,3 @@
-
-
-
 package com.example.SpringSecurityJwt.controller;
 import com.example.SpringSecurityJwt.model.AuthenticationResponse;
 import com.example.SpringSecurityJwt.model.User;
@@ -23,24 +20,13 @@ public class AuthenticationController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody User request
-    ) {
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody User request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(
-            @RequestBody User request
-    ) {
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody User request) {
         return ResponseEntity.ok(authService.authenticate(request));
     }
 
-    @PostMapping("/refresh_token")
-    public ResponseEntity refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) {
-        return authService.refreshToken(request, response);
-    }
 }

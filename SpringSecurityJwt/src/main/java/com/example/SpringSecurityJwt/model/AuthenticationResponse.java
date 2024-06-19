@@ -2,28 +2,21 @@ package com.example.SpringSecurityJwt.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AuthenticationResponse {
-    @JsonProperty("access_token")
-    private String accessToken;
 
-    @JsonProperty("refresh_token")
-    private String refreshToken;
-
+    @JsonProperty("token")
+    private final String token;
     @JsonProperty("message")
     private String message;
 
-    public AuthenticationResponse(String accessToken, String refreshToken, String message) {
-        this.accessToken = accessToken;
+    public AuthenticationResponse(String token, String message) {
+        this.token = token;
         this.message = message;
-        this.refreshToken = refreshToken;
     }
 
-    public String getAccessToken() {
-        return accessToken;
+    public String getToken() {
+        return token;
     }
 
-    public String getRefreshToken() {
-        return refreshToken;
-    }
 
     public String getMessage() {
         return message;
