@@ -1,10 +1,13 @@
 package com.example.SpringSecurityJwt.service;
 
 import com.example.SpringSecurityJwt.model.User;
+import com.example.SpringSecurityJwt.repository.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +17,20 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
+    public JwtService(TokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
 
-    String secretKey = "e6379c4c42cc3ed2493b9cc196f2a3225fb978251870bc8e71e56a264a0c9b4d";
+    private final TokenRepository tokenRepository;
+
+    @Value("${application.security.jwt.secret-key}")
+    private String secretKey;
+
+    @Value("${application.security.jwt.access-token-expiration}")
+    private long accessTokenExpire;
+
+    @Value("${application.security.jwt.refresh-token-expiration}")
+    private long refreshTokenExpire;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -23,7 +38,10 @@ public class JwtService {
 
     public boolean isValid(String token, UserDetails user) {
         String username = extractUsername(token);
-        return (username.equals(user.getUsername())) && !isTokenExpired(token);
+
+        boolean isValidToken = tokenRepository.findByToken(token)
+                .map(t -> !t.isLoggedOut()).orElse(false);
+        return (username.equals(user.getUsername())) && !isTokenExpired(token) && isValidToken;
     }
 
     private boolean isTokenExpired(String token) {
@@ -47,13 +65,23 @@ public class JwtService {
                 .getBody();
     }
 
-    String generateToken(User user) {
-        return Jwts.builder()
+    String generateAccessToken(User user) {
+        return generateToken(user, accessTokenExpire);
+    }
+
+    String generateRefreshToken(User user) {
+      return generateToken(user, refreshTokenExpire);
+
+    }
+
+    private String generateToken(User user, long expireTime) {
+        String token = Jwts.builder()
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000)) // 24 hours
+                .setExpiration(new Date(System.currentTimeMillis() + expireTime)) // 24 hours
                 .signWith(getSigninKey())
                 .compact();
+        return token;
     }
 
     private SecretKey getSigninKey() {
